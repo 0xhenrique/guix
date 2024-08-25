@@ -29,4 +29,6 @@
     "feh"
     "picom"
     "font-iosevka"
+    "setxkbmap"
+    "xdg-utils"
     "htop"))

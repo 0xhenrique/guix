@@ -46,6 +46,8 @@
 			  usbutils
 			  udiskie
 			  udisks
+			  ;; User specific packages are defined in manifest.scm
+			  ;; ...
 			  )
 		    %base-packages))
 
