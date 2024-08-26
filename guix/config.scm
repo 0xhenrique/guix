@@ -9,10 +9,18 @@
 
 ;; Indicate which modules to import to access the variables
 ;; used in this configuration.
-(use-modules (gnu))
+(use-modules (nongnu packages linux)
+	     (nongnu system linux-initrd)
+	     (gnu)
+	     (gnu services)
+	     (gnu services desktop)
+	     (gnu packages))
 (use-service-modules cups desktop networking ssh xorg)
 
 (operating-system
+  (kernel linux)
+  (initrd microcode-initrd)
+  (firmware (list linux-firmware))
   (locale "en_GB.utf8")
   (timezone "Europe/Lisbon")
   (keyboard-layout (keyboard-layout "us"))
@@ -31,37 +39,25 @@
   ;; under their own account: use 'guix search KEYWORD' to search
   ;; for packages and 'guix install PACKAGE' to install a package.
   (packages (append (list (specification->package "emacs")
-			  (specification->package "emacs-exwm")
-			  (specification->package
-			   "emacs-desktop-environment")
-			  (specification->package "nss-certs")
-			  ;; Essentials
-			  vim
-			  git
-			  wget
-			  gcc
-			  clang
-			  fd
-			  cmake
-			  usbutils
-			  udiskie
-			  udisks
-			  ;; User specific packages are defined in manifest.scm
-			  ;; ...
-			  )
-		    %base-packages))
+                          (specification->package "emacs-exwm")
+                          (specification->package "i3-wm")
+                          (specification->package
+                           "emacs-desktop-environment")
+                          (specification->package "nss-certs"))
+                    %base-packages))
 
   ;; Below is the list of system services.  To search for available
   ;; services, run 'guix system search KEYWORD' in a terminal.
   (services
    (append (list (service xfce-desktop-service-type)
                  (service cups-service-type)
+		 (service bluetooth-service-type
+			  (bluetooth-configuration
+			   (auto-enable? #t)))
                  (set-xorg-configuration
                   (xorg-configuration (keyboard-layout keyboard-layout))))
-
-           ;; This is the default list of services we
-           ;; are appending to.
            %desktop-services))
+  
   (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
                 (targets (list "/boot/efi"))
