@@ -5,7 +5,7 @@ Head to https://gitlab.com/nonguix/nonguix if you want to know more about nongui
 ** How to use
 Do not forget to set GUILE_LOAD_PATH:
 #+BEGIN_SRC
-  export GUILE_LOAD_PATH="/etc/guix/configs"
+  export GUILE_LOAD_PATH="/etc/guix/core"
 #+END_SRC
 
 Reconfigure the system (this might take a LONG time depending on your situation):

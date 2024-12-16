@@ -11,9 +11,7 @@
 
 (operating-system
  (inherit base-config)    ; Basic system configuration from core/base.scm
-
  (users user-accounts)    ; Import users from core/users.scm
-
  (packages system-packages) ; System-wide packages from core/packages.scm
 
  (services
@@ -22,7 +20,5 @@
    desktop-services))      ; Desktop configuration (GNOME, EXWM etc...)
 
  (bootloader bootloader-config) ; Bootloader config from core/base.scm
-
  (swap-devices swap-config)     ; Swap configuration from core/base.scm
-
  (file-systems file-systems-config)) ; File systems from core/base.scm
