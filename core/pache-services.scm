@@ -1,3 +1,13 @@
+(define-module (pache-services)
+  #:use-module (gnu services)
+  #:use-module (guix gexp)
+  #:use-module (gnu services base)
+  #:use-module (gnu services desktop)
+  #:use-module (gnu services samba)
+  #:use-module (gnu services web)
+  #:export (service-configurations substitute-config))
+
+
 (define service-configurations
   (list
    (service gnome-desktop-service-type)

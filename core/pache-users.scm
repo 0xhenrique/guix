@@ -1,3 +1,8 @@
+(define-module (pache-users)
+  #:use-module (gnu system accounts)
+  #:use-module (gnu system shadow)
+  #:export (user-accounts))
+
 (define user-accounts
   (cons* (user-account
            (name "arisu")
