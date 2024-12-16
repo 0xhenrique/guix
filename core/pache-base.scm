@@ -2,6 +2,7 @@
   #:use-module (gnu)                      ; Required for operating-system, bootloader, etc.
   #:use-module (gnu system)               ; Required for %base-file-systems
   #:use-module (gnu services)             ; For services or other configs
+  #:use-module (nongnu packages linux)    ; Father forgive me for I have sinned
   #:use-module (gnu packages)             ; For packages like linux-firmware
   #:export (base-config                  ; Export definitions to make them available
             bootloader-config
