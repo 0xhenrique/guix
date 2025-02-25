@@ -10,6 +10,7 @@
                                 "/modules"))
 
 (use-modules (gnu)
+	     (gnu packages)
 	     (my-modules filesystems)
 	     (my-modules nginx)
 	     (my-modules samba)
@@ -32,6 +33,17 @@
                   (home-directory "/home/arisu")
                   (supplementary-groups '("wheel" "netdev" "audio" "video")))
                 %base-user-accounts))
+
+  (packages (append (list (specification->package "emacs")
+			  (specification->package "emacs-exwm")
+			  (specification->package "git")
+			  (specification->package "windowmaker")
+			  (specification->package "wmnd")
+			  (specification->package "deluge")
+			  (specification->package "nicotine+")
+			  (specification->package "emacs-exwm")
+			  (specification->package "emacs-desktop-environment"))
+		    %base-packages))
 
   (services (append (list 
 		     my-samba-service
