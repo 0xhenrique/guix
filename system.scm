@@ -6,61 +6,74 @@
 ;;  \____|  \___/  |___| /_/\_\ ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(add-to-load-path (string-append (dirname (current-filename))
-                                "/modules"))
+;; Personal desktop/server configuration
+;; EXWM-based setup with file sharing services
+
+(add-to-load-path (string-append (dirname (current-filename)) "/modules"))
 
 (use-modules (gnu)
-	     (gnu packages)
-	     (my-modules filesystems)
-	     (my-modules nginx)
-	     (my-modules samba)
-	     (nongnu packages linux))
+             (gnu packages)
+             (arisu packages)
+             (arisu services)
+             (arisu filesystems)
+             (nongnu packages linux))
 
-(use-service-modules cups desktop networking ssh xorg)
+(use-service-modules desktop networking ssh xorg)
 
 (operating-system
   (locale "en_GB.utf8")
   (timezone "Europe/Lisbon")
   (keyboard-layout (keyboard-layout "us"))
   (host-name "wired")
+  
+  ;; Non-free kernel for hardware compatibility
   (kernel linux)
   (firmware (list linux-firmware))
 
+  ;; User accounts
   (users (cons* (user-account
-                  (name "arisu")
-                  (comment "arisu")
-                  (group "users")
-                  (home-directory "/home/arisu")
-                  (supplementary-groups '("wheel" "netdev" "audio" "video")))
+                 (name "arisu")
+                 (comment "arisu")
+                 (group "users")
+                 (home-directory "/home/arisu")
+                 (supplementary-groups '("wheel" "netdev" "audio" "video")))
                 %base-user-accounts))
 
-  (packages (append (list (specification->package "emacs")
-			  (specification->package "emacs-exwm")
-			  (specification->package "git")
-			  (specification->package "windowmaker")
-			  (specification->package "wmnd")
-			  (specification->package "deluge")
-			  (specification->package "nicotine+")
-			  (specification->package "emacs-exwm")
-			  (specification->package "emacs-desktop-environment"))
-		    %base-packages))
+  ;; System packages - organized by purpose
+  (packages (append arisu-desktop-packages
+                    arisu-development-packages  
+                    arisu-server-packages
+                    %base-packages))
 
-  (services (append (list 
-		     my-samba-service
-		     my-nginx-service
-		     (service xfce-desktop-service-type)
-		     (service openssh-service-type)
-		     (set-xorg-configuration
-		      (xorg-configuration (keyboard-layout keyboard-layout))))
-		    %desktop-services))
+  ;; Services - desktop with server capabilities
+  (services (append (list
+                     ;; Server services
+                     arisu-samba-service
+                     arisu-nginx-service
+					 ;; error: arisu-mpd-service: unbound variable
+                     ;arisu-mpd-service
 
+                     ;; System services
+                     (service openssh-service-type)
+
+                     ;; X11 configuration for EXWM
+                     (set-xorg-configuration
+                      (xorg-configuration 
+                       (keyboard-layout keyboard-layout))))
+
+                    ;; Use base desktop services
+                    ;; EXWM will override the window manager
+                    %desktop-services))
+
+  ;; Boot configuration
   (bootloader (bootloader-configuration
-                (bootloader grub-efi-bootloader)
-                (targets (list "/boot/efi"))
-                (keyboard-layout keyboard-layout)))
+               (bootloader grub-efi-bootloader)
+               (targets (list "/boot/efi"))
+               (keyboard-layout keyboard-layout)))
 
+  ;; Swap space
   (swap-devices (list (swap-space
-                        (target (uuid
-                                 "b47f38e0-3f1f-43be-b255-e708127ceccd")))))
+                       (target (uuid "b47f38e0-3f1f-43be-b255-e708127ceccd")))))
 
-  (file-systems my-file-systems))
+  ;; File systems
+  (file-systems arisu-file-systems))
