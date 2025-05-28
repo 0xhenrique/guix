@@ -59,20 +59,20 @@ Packages are grouped into three categories:
 
 1. Clone to =~/.config/guix/=
 2. Set up the module load path:
-   #+BEGIN_SRC shell
-   export GUILE_LOAD_PATH="~/.config/guix/modules"
-   #+END_SRC
+#+BEGIN_SRC shell
+ export GUILE_LOAD_PATH="~/.config/guix/modules"
+#+END_SRC
 
 3. Update channels:
-   #+BEGIN_SRC shell
-   guix pull
-   #+END_SRC
+#+BEGIN_SRC shell
+  guix pull
+#+END_SRC
 
 ** System Reconfiguration
 
 Apply the configuration (this will take a LONG TIME on first run):
 #+BEGIN_SRC shell
-sudo -E guix system reconfigure ~/.config/guix/system.scm
+  sudo -E guix system reconfigure ~/.config/guix/system.scm
 #+END_SRC
 
 ** Post-Installation Setup
@@ -80,9 +80,9 @@ sudo -E guix system reconfigure ~/.config/guix/system.scm
 *** MPD Configuration
 MPD directories creation and initialisation:
 #+BEGIN_SRC shell
-mkdir -p ~/.config/mpd/playlists
-sudo herd restart mpd
-mpc update  # to scan music library
+  mkdir -p ~/.config/mpd/playlists
+  sudo herd restart mpd
+  mpc update  # to scan music library
 #+END_SRC
 
 *** File Shares
@@ -93,8 +93,8 @@ Ensure your storage drives are mounted:
 *** Web Directory
 Create web content directory:
 #+BEGIN_SRC shell
-sudo mkdir -p /var/www/wired
-sudo chown arisu:users /var/www/wired
+  sudo mkdir -p /var/www/wired
+  sudo chown arisu:users /var/www/wired
 #+END_SRC
 
 * Customisation
@@ -140,18 +140,18 @@ This configuration uses the non-free Linux kernel and firmware because my graphi
 
 ** System Updates
 #+BEGIN_SRC shell
-guix pull && sudo -E guix system reconfigure ~/.config/guix/system.scm
+  guix pull && sudo -E guix system reconfigure ~/.config/guix/system.scm
 #+END_SRC
 
 ** Garbage Collection
 #+BEGIN_SRC shell
-sudo guix gc --delete-older-than=1m  # Remove builds older than 1 month
+  sudo guix gc --delete-older-than=1m  # Remove builds older than 1 month
 #+END_SRC
 
 ** Store Verification
 If you encounter corrupted derivations:
 #+BEGIN_SRC shell
-sudo guix gc --verify=repair
+  sudo guix gc --verify=repair
 #+END_SRC
 
 * Troubleshooting
@@ -161,8 +161,8 @@ sudo guix gc --verify=repair
 *** Services Failing
 Checking service status with =herd=:
 #+BEGIN_SRC shell
-sudo herd status
-sudo herd status mpd  # Check specific service
+  sudo herd status
+  sudo herd status mpd  # Check specific service
 #+END_SRC
 
 *** Module Loading Errors
