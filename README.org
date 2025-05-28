@@ -1,14 +1,179 @@
-* Config files for my Guix system
-Warning: this Guix configuration uses non-free software.
-Head to https://gitlab.com/nonguix/nonguix if you want to know more about nonguix.
+#+TITLE: GNU Guix Config (Desktop + Server)
+#+AUTHOR: 0xhenrique
+#+DATE: 2025
 
-** How to use
-Do not forget to set GUILE_LOAD_PATH:
-#+BEGIN_SRC
-  export GUILE_LOAD_PATH="/etc/guix/core"
+* Overview
+
+This is my personal GNU Guix system configuration for a desktop machine that I also use as local file server. The setup is built around EXWM (Emacs X Window Manager) for the desktop environment and includes various server services for local network.
+
+** System Overview
+
+- *Minimal desktop footprint*: EXWM for desktop instead of xfce/gnome etc
+- *Server capabilities*: File sharing via Samba, web serving via nginx, music streaming via MPD
+- *Non-free programs*: I'm using the nonguix channel for hardware compatibility (mainly graphics drivers)
+
+* Architecture
+
+** Directory Structure
+#+BEGIN_EXAMPLE
+~/.config/guix/
+├── system.scm              # Main system configuration
+├── channels.scm            # Channel definitions (includes nonguix)
+└── modules/
+    └── arisu/
+        ├── packages.scm    # Package collections organized by purpose
+        ├── services.scm    # Custom service configurations
+        └── filesystems.scm # File system etc...
+#+END_EXAMPLE
+
+** Package Organization
+
+Packages are grouped into three categories:
+
+- *Desktop packages*: EXWM, terminal emulator, media players, MPD clients
+- *Development packages*: Git, GIMP, development tools
+- *Server packages*: System monitoring, file sharing clients
+
+** Services Configuration
+
+*** File Sharing (Samba)
+- Serves =/public/hdd1= and =/public/hdd2= as network shares - I'm currently wondering how this could be done better
+
+*** Web Server (nginx)
+- Serves static files from =/var/www/wired=
+- Directory browsing enabled for file exploration
+- Accessible on localhost and by hostname "wired"
+
+*** Music Server (MPD)
+- Multiple client support (ncmpcpp, Emacs, web clients)
+- HTTP streaming on port 8000 for remote access
+- Music stored in =/public/hdd1/Music/=
+
+* Installation and Usage
+
+** Prerequisites
+
+*Warning*: This configuration uses non-free software via the nonguix channel!
+
+** Initial Setup
+
+1. Clone to =~/.config/guix/=
+2. Set up the module load path:
+   #+BEGIN_SRC shell
+   export GUILE_LOAD_PATH="~/.config/guix/modules"
+   #+END_SRC
+
+3. Update channels:
+   #+BEGIN_SRC shell
+   guix pull
+   #+END_SRC
+
+** System Reconfiguration
+
+Apply the configuration (this will take a LONG TIME on first run):
+#+BEGIN_SRC shell
+sudo -E guix system reconfigure ~/.config/guix/system.scm
 #+END_SRC
 
-Reconfigure the system (this might take a LONG time depending on your situation):
-#+BEGIN_SRC
-  sudo guix system reconfigure /etc/guix/config.scm
+** Post-Installation Setup
+
+*** MPD Configuration
+MPD directories creation and initialisation:
+#+BEGIN_SRC shell
+mkdir -p ~/.config/mpd/playlists
+sudo herd restart mpd
+mpc update  # to scan music library
 #+END_SRC
+
+*** File Shares
+Ensure your storage drives are mounted:
+- =/public/hdd1= - sirius
+- =/public/hdd2= - rigel
+
+*** Web Directory
+Create web content directory:
+#+BEGIN_SRC shell
+sudo mkdir -p /var/www/wired
+sudo chown arisu:users /var/www/wired
+#+END_SRC
+
+* Customisation
+
+** Adding Packages
+
+Edit =modules/arisu/packages.scm= and add packages to the appropriate category:
+- =arisu-desktop-packages= for GUI applications
+- =arisu-development-packages= for development tools  
+- =arisu-server-packages= for system utilities
+
+** Service Configuration
+
+Service configurations are in =modules/arisu/services.scm=:
+- Modify Samba shares in =arisu-samba-service=
+- Adjust nginx settings in =arisu-nginx-service=
+- Configure MPD options in =arisu-mpd-service=
+
+** File Systems
+
+Storage configuration is in =modules/arisu/filesystems.scm=. UUIDs are obtained via =blkid=.
+
+* Usage Notes
+
+** EXWM Setup
+This configuration assumes you'll configure EXWM in your Emacs setup. Expect this configuration to fail if you're not using EXWM.
+
+** Network Services
+- Samba shares: =\\wired\hdd1= and =\\wired\hdd2=
+- Web interface: =http://wired= or =http://localhost=
+- MPD streaming: =http://localhost:6666=
+- SSH access: Port 22 (keys separately)
+
+** Music Management
+- I'm still figuring out =listen.el= in Emacs. For now, I will stick to =mcp= and =ncmpcpp=
+- Mobile apps can connect to =my-ip:6600=
+
+* Hardware Considerations
+
+This configuration uses the non-free Linux kernel and firmware because my graphics card doesn't have free drivers.
+
+* Maintenance
+
+** System Updates
+#+BEGIN_SRC shell
+guix pull && sudo -E guix system reconfigure ~/.config/guix/system.scm
+#+END_SRC
+
+** Garbage Collection
+#+BEGIN_SRC shell
+sudo guix gc --delete-older-than=1m  # Remove builds older than 1 month
+#+END_SRC
+
+** Store Verification
+If you encounter corrupted derivations:
+#+BEGIN_SRC shell
+sudo guix gc --verify=repair
+#+END_SRC
+
+* Troubleshooting
+
+** Some issues I already faced
+
+*** Services Failing
+Checking service status with =herd=:
+#+BEGIN_SRC shell
+sudo herd status
+sudo herd status mpd  # Check specific service
+#+END_SRC
+
+*** Module Loading Errors
+Ensure =GUILE_LOAD_PATH= includes your modules directory.
+
+*** Permission Issues
+Services run as different users:
+- MPD runs as =arisu= to access music files
+- Samba runs as system service with guest access
+- nginx runs as system service
+
+* Contributing
+
+This is a personal configuration, but feel free to use it as inspiration for your own Guix setup. The modular structure makes it easy to adapt individual components. PRs are always welcome.
